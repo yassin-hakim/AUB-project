@@ -30,14 +30,14 @@ Run from the repository root:
 pytest -q
 ```
 
-Recorded result after the final compliance fixes: **20 passed**. The suite retains baseline behavior coverage and includes these four focused mid-course feature tests:
+Recorded result after the final compliance fixes: **21 passed**. The suite retains baseline behavior coverage and includes these four focused mid-course feature tests:
 
 1. creation with a due date and normalized tags;
 2. overdue filtering with Done-task exclusion;
 3. case-insensitive tag filtering;
 4. PATCH clearing a due date and replacing tags.
 
-It also verifies that blank tags are rejected with a `422` response. The browser implementation was manually checked to confirm a failed task load keeps the Kanban columns rendered and exposes a Retry action.
+It also verifies that blank tags are rejected with a `422` response and that the browser preserves blank comma-separated tag entries so the API can return that error. The browser implementation was manually checked to confirm a failed task load keeps the Kanban columns rendered and exposes a Retry action.
 
 ## Break Test evidence
 
