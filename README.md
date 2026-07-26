@@ -30,6 +30,8 @@ The intended submission branch is `mid-course-project`.
 - `GET /tasks/{id}`, `POST /tasks`, `PATCH /tasks/{id}`, and `DELETE /tasks/{id}` provide task CRUD.
 - PATCH status changes permit only `ToDo → InProgress`, `InProgress → Done`, and `Done → InProgress`. Skipping a state, returning Done to ToDo, and no-op status updates return `400`.
 - Due dates are optional. A task is overdue only when its due date is before today and it is not Done.
+- Tags are trimmed, lower-cased, de-duplicated, limited to eight entries, and may not be blank. Invalid tag input returns `422`.
+- If the board cannot load tasks, its three columns remain visible and the page provides a Retry action.
 
 ## Assignment documentation
 
