@@ -66,15 +66,20 @@ class TaskUpdate(BaseModel):
     due_date: date | None = None
     tags: list[str] | None = Field(default=None, max_length=8)
 
-    @field_validator("title", "assignee", "description")
+    @field_validator("title")
     @classmethod
-    def strip_optional_text(cls, value: str | None) -> str | None:
+    def strip_optional_title(cls, value: str | None) -> str | None:
         if value is None:
             return value
         value = value.strip()
         if not value:
-            raise ValueError("This field cannot be blank")
+            raise ValueError("Title cannot be blank")
         return value
+
+    @field_validator("assignee", "description")
+    @classmethod
+    def strip_optional_text(cls, value: str | None) -> str | None:
+        return value.strip() if value is not None else None
 
     @field_validator("tags")
     @classmethod

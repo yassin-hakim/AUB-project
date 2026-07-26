@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.models import Priority, Status, Task, TaskCreate, TaskUpdate
-from app.store import store
+from app.store import InvalidStatusTransition, store
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = ROOT_DIR / "frontend"
@@ -39,9 +39,20 @@ def create_task(payload: TaskCreate) -> Task:
     return store.create(payload)
 
 
+@app.get("/tasks/{task_id}", response_model=Task)
+def get_task(task_id: int) -> Task:
+    task = store.get(task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
+
+
 @app.patch("/tasks/{task_id}", response_model=Task)
 def update_task(task_id: int, payload: TaskUpdate) -> Task:
-    task = store.update(task_id, payload)
+    try:
+        task = store.update(task_id, payload)
+    except InvalidStatusTransition as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return task

@@ -4,6 +4,19 @@ from datetime import date
 from app.models import Priority, Status, Task, TaskCreate, TaskUpdate
 
 
+class InvalidStatusTransition(ValueError):
+    """Raised when a task status change violates the Module 2 workflow."""
+
+
+ALLOWED_STATUS_TRANSITIONS = frozenset(
+    {
+        (Status.TODO, Status.IN_PROGRESS),
+        (Status.IN_PROGRESS, Status.DONE),
+        (Status.DONE, Status.IN_PROGRESS),
+    }
+)
+
+
 class TaskStore:
     def __init__(self) -> None:
         self.reset()
@@ -52,6 +65,10 @@ class TaskStore:
         if current is None:
             return None
         values = payload.model_dump(exclude_unset=True)
+        if "status" in values and (current.status, values["status"]) not in ALLOWED_STATUS_TRANSITIONS:
+            raise InvalidStatusTransition(
+                f"Status cannot move from {current.status.value} to {values['status'].value}"
+            )
         updated = current.model_copy(update=values)
         self._tasks[task_id] = updated
         return updated

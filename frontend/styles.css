@@ -23,7 +23,8 @@ input, select, textarea { min-width: 0; padding: .55rem .65rem; border: 1px soli
 .column h2 { margin-top: 0; font-size: 1rem; }
 .column-count { color: #64748b; font-size: .8rem; font-weight: 500; }
 .task-list { display: grid; gap: .75rem; }
-.task-card { background: white; padding: .9rem; border: 1px solid #dbe4f0; border-radius: .65rem; box-shadow: 0 1px 2px #0f172a0a; }
+.task-card { background: white; padding: .9rem; border: 1px solid #dbe4f0; border-radius: .65rem; box-shadow: 0 1px 2px #0f172a0a; cursor: grab; }
+.task-card.dragging { opacity: .5; }.task-list { min-height: 16rem; }.task-list:has(.dragging) { outline: 2px dashed #93c5fd; outline-offset: .3rem; border-radius: .5rem; }
 .task-card h3 { margin: 0; font-size: 1rem; }.task-card p { margin: .45rem 0; color: #475569; font-size: .9rem; white-space: pre-wrap; }
 .metadata, .tag-list, .card-actions { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; }
 .metadata { color: #64748b; font-size: .78rem; }.tag { background: #dbeafe; color: #1d4ed8; border-radius: 99px; padding: .2rem .45rem; font-size: .75rem; }.overdue { color: #b91c1c; font-weight: 700; }
