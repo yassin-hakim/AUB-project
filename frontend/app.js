@@ -98,7 +98,7 @@ function taskPayload() {
     priority: document.querySelector("#priority").value,
     assignee: document.querySelector("#assignee").value.trim(),
     due_date: document.querySelector("#due-date").value || null,
-    tags: document.querySelector("#tags").value.split(",").map((tag) => tag.trim()).filter(Boolean),
+    tags: parseTags(document.querySelector("#tags").value),
   };
   if (!editingTask) return payload;
   return Object.fromEntries(Object.entries(payload).filter(
