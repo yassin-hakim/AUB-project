@@ -10,6 +10,7 @@ const columns = [
 ];
 
 let tasks = [];
+let editingTask = null;
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, (character) => ({
@@ -26,8 +27,8 @@ function dateLabel(task) {
 function render() {
   board.innerHTML = columns.map(([status, title]) => {
     const matching = tasks.filter((task) => task.status === status);
-    return `<section class="column" data-status="${status}"><h2>${title} <span class="column-count">${matching.length}</span></h2><div class="task-list">${matching.map((task) => `
-      <article class="task-card">
+    return `<section class="column" data-status="${status}"><h2>${title} <span class="column-count">${matching.length}</span></h2><div class="task-list" data-drop-status="${status}">${matching.map((task) => `
+      <article class="task-card" draggable="true" data-task-id="${task.id}">
         <h3>${escapeHtml(task.title)}</h3>
         ${task.description ? `<p>${escapeHtml(task.description)}</p>` : ""}
         <div class="metadata"><span>${escapeHtml(task.priority)}</span><span>${task.assignee ? `• ${escapeHtml(task.assignee)}` : ""}</span>${dateLabel(task)}</div>
@@ -67,6 +68,7 @@ async function loadTasks() {
 function openDialog(task = null) {
   form.reset();
   formError.textContent = "";
+  editingTask = task;
   document.querySelector("#dialog-title").textContent = task ? "Edit task" : "New task";
   document.querySelector("#task-id").value = task?.id ?? "";
   document.querySelector("#title").value = task?.title ?? "";
@@ -81,7 +83,7 @@ function openDialog(task = null) {
 }
 
 function taskPayload() {
-  return {
+  const payload = {
     title: document.querySelector("#title").value.trim(),
     description: document.querySelector("#description").value.trim(),
     status: document.querySelector("#status").value,
@@ -90,6 +92,10 @@ function taskPayload() {
     due_date: document.querySelector("#due-date").value || null,
     tags: document.querySelector("#tags").value.split(",").map((tag) => tag.trim()).filter(Boolean),
   };
+  if (!editingTask) return payload;
+  return Object.fromEntries(Object.entries(payload).filter(
+    ([key, value]) => JSON.stringify(value) !== JSON.stringify(editingTask[key]),
+  ));
 }
 
 document.querySelector("#new-task-button").addEventListener("click", () => openDialog());
@@ -99,10 +105,15 @@ document.querySelector("#cancel-button").addEventListener("click", () => dialog.
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const id = document.querySelector("#task-id").value;
+  const payload = taskPayload();
+  if (id && Object.keys(payload).length === 0) {
+    dialog.close();
+    return;
+  }
   const response = await fetch(id ? `/tasks/${id}` : "/tasks", {
     method: id ? "PATCH" : "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(taskPayload()),
+    body: JSON.stringify(payload),
   });
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
@@ -110,6 +121,7 @@ form.addEventListener("submit", async (event) => {
     return;
   }
   dialog.close();
+  editingTask = null;
   loadTasks();
 });
 
@@ -123,6 +135,43 @@ board.addEventListener("click", async (event) => {
     if (!response.ok) notice.textContent = `Could not delete task (${response.status})`;
     else loadTasks();
   }
+});
+
+board.addEventListener("dragstart", (event) => {
+  const card = event.target.closest(".task-card");
+  if (!card) return;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", card.dataset.taskId);
+  card.classList.add("dragging");
+});
+
+board.addEventListener("dragend", (event) => {
+  event.target.closest(".task-card")?.classList.remove("dragging");
+});
+
+board.addEventListener("dragover", (event) => {
+  if (event.target.closest(".task-list")) event.preventDefault();
+});
+
+board.addEventListener("drop", async (event) => {
+  const list = event.target.closest(".task-list");
+  if (!list) return;
+  event.preventDefault();
+  const task = tasks.find((item) => item.id === Number(event.dataTransfer.getData("text/plain")));
+  const status = list.dataset.dropStatus;
+  if (!task || task.status === status) return;
+  const response = await fetch(`/tasks/${task.id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    notice.textContent = error.detail || `Could not move task (${response.status})`;
+    return;
+  }
+  notice.textContent = "";
+  loadTasks();
 });
 
 ["#status-filter", "#priority-filter", "#overdue-filter"].forEach((selector) => document.querySelector(selector).addEventListener("change", loadTasks));
