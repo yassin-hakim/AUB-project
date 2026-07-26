@@ -45,7 +45,7 @@ class TaskInput(BaseModel):
         for tag in tags:
             tag = tag.strip().lower()
             if not tag:
-                continue
+                raise ValueError("Tags cannot be blank")
             if len(tag) > 24:
                 raise ValueError("Each tag must be 24 characters or fewer")
             if tag not in cleaned:

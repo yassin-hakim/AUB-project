@@ -30,12 +30,14 @@ Run from the repository root:
 pytest -q
 ```
 
-Recorded result after restoration: **17 passed**. The suite retains baseline behavior coverage and adds these four focused mid-course feature tests:
+Recorded result after the final compliance fixes: **20 passed**. The suite retains baseline behavior coverage and includes these four focused mid-course feature tests:
 
 1. creation with a due date and normalized tags;
 2. overdue filtering with Done-task exclusion;
 3. case-insensitive tag filtering;
 4. PATCH clearing a due date and replacing tags.
+
+It also verifies that blank tags are rejected with a `422` response. The browser implementation was manually checked to confirm a failed task load keeps the Kanban columns rendered and exposes a Retry action.
 
 ## Break Test evidence
 
@@ -54,4 +56,5 @@ These deliberate faults were applied temporarily, their targeted tests were run,
 4. Enable **Overdue only**, then combine Tag, Status, and Priority filters; confirm the board reflects the server-side intersection.
 5. Drag a ToDo card into In Progress; confirm it moves. Drag it into Done; confirm the API error prevents the skipped transition. Move In Progress to Done, then reopen Done to In Progress; confirm both succeed.
 6. Edit a task, clear its due date, and save; confirm it displays `No due date`.
-7. Submit a blank title; confirm the form displays FastAPI's validation error rather than failing silently.
+7. Submit a blank title or a blank tag; confirm the form displays FastAPI's validation error rather than failing silently.
+8. Temporarily stop the API or block the `/tasks` request; confirm the three columns remain visible and **Retry** reloads the board.
