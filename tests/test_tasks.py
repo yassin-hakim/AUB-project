@@ -163,3 +163,10 @@ def test_patch_can_clear_due_date_and_replace_tags(client):
 def test_rejects_blank_title(client):
     response = client.post("/tasks", json={"title": "   "})
     assert response.status_code == 422
+
+
+@pytest.mark.parametrize("tags", [[""], ["   "], ["frontend", ""]])
+def test_rejects_blank_tags(client, tags):
+    response = client.post("/tasks", json={"title": "Tag validation", "tags": tags})
+    assert response.status_code == 422
+    assert "Tags cannot be blank" in response.json()["detail"][0]["msg"]
