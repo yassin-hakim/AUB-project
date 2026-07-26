@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Tracker</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main>
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Task Tracker</p>
+          <h1>Stay on top of the work.</h1>
+        </div>
+        <button id="new-task-button" class="primary-button">New task</button>
+      </header>
+
+      <section class="filters" aria-label="Task filters">
+        <label>Status <select id="status-filter"><option value="">All statuses</option><option>ToDo</option><option>InProgress</option><option>Done</option></select></label>
+        <label>Priority <select id="priority-filter"><option value="">All priorities</option><option>High</option><option>Medium</option><option>Low</option></select></label>
+        <label>Tag <input id="tag-filter" type="search" placeholder="e.g. frontend" /></label>
+        <label class="checkbox-label"><input id="overdue-filter" type="checkbox" /> Overdue only</label>
+        <button id="clear-filters" class="text-button">Clear filters</button>
+      </section>
+
+      <p id="notice" class="notice" role="status"></p>
+      <section id="board" class="board" aria-live="polite"></section>
+    </main>
+
+    <dialog id="task-dialog">
+      <form id="task-form" method="dialog">
+        <div class="dialog-heading"><h2 id="dialog-title">New task</h2><button type="button" id="close-dialog" class="icon-button" aria-label="Close">×</button></div>
+        <input id="task-id" type="hidden" />
+        <label>Title <input id="title" required maxlength="120" /></label>
+        <label>Description <textarea id="description" maxlength="1000" rows="3"></textarea></label>
+        <div class="form-row">
+          <label>Status <select id="status"><option>ToDo</option><option>InProgress</option><option>Done</option></select></label>
+          <label>Priority <select id="priority"><option>High</option><option selected>Medium</option><option>Low</option></select></label>
+        </div>
+        <div class="form-row">
+          <label>Assignee <input id="assignee" maxlength="80" /></label>
+          <label>Due date <input id="due-date" type="date" /></label>
+        </div>
+        <label>Tags <input id="tags" maxlength="199" placeholder="frontend, client, urgent" /><span>Comma-separated; up to 8 tags.</span></label>
+        <p id="form-error" class="form-error" role="alert"></p>
+        <div class="dialog-actions"><button type="button" id="cancel-button" class="secondary-button">Cancel</button><button class="primary-button" type="submit">Save task</button></div>
+      </form>
+    </dialog>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
