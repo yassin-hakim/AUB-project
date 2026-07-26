@@ -60,8 +60,16 @@ async function loadTasks() {
     notice.textContent = tasks.length ? "" : "No tasks match these filters.";
     render();
   } catch (error) {
-    notice.textContent = error.message;
-    board.innerHTML = "";
+    notice.textContent = "";
+    const message = document.createElement("span");
+    message.textContent = error.message;
+    const retryButton = document.createElement("button");
+    retryButton.type = "button";
+    retryButton.className = "text-button";
+    retryButton.textContent = "Retry";
+    retryButton.addEventListener("click", loadTasks);
+    notice.append(message, " ", retryButton);
+    render();
   }
 }
 
