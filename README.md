@@ -57,3 +57,57 @@ The mid-course deliverables are in [`docs/midcourse`](docs/midcourse). The final
 - [Container decision](docs/decisions/container-strategy.md) and [tool-fit reflection](docs/tool-reflection.md)
 - [Security review](docs/security-review.md), [governance worksheet](docs/governance-worksheet.md), and [AI-usage rules](docs/ai-usage.md)
 - [Comments-feature planning review](docs/decisions/comments-feature-plan.md), [context-strategy comparison](docs/architecture.md), and [personal AI playbook](docs/ai-playbook.md)
+
+## Final Project
+
+**Branch reviewed:** `final-project`.
+
+### What this submission demonstrates
+
+- The existing Task Tracker remains within the course scope; this release adds verification and documentation, not product features.
+- GitHub Actions is configured to run the complete pytest suite on pushes and pull requests.
+- Docker is configured to run the API at `/health` as a non-root user.
+- The evidence and AI-ownership records are in `docs/`.
+
+### How to run locally
+
+```bash
+python -m venv .venv
+. .venv/bin/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+Open `http://127.0.0.1:8000/` for the Kanban board, then use `New task` to open the create/edit form. Check the API with:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+### How to run tests
+
+```bash
+python -m pytest -v
+```
+
+### How to run with Docker
+
+```bash
+docker build -t task-tracker .
+docker run --rm -d -p 8000:8000 --name task-tracker task-tracker
+curl http://127.0.0.1:8000/health
+docker exec task-tracker whoami
+docker stop task-tracker
+```
+
+The expected health response is `{"status":"ok"}` and the expected container user is `app`.
+
+### Evidence files
+
+- [Release evidence](docs/release-evidence.md)
+- [Final AI review and ownership evidence](docs/final-ai-review.md)
+- [Personal AI playbook](docs/ai-playbook.md)
+
+### AI assistance summary
+
+AI helped draft and review the CI, Docker, release documentation, and security checklist. I verified the application with the full pytest suite, JavaScript syntax checks, a live `/health` request, and a manual repository hygiene scan. I rejected the suggestion to allow CI failures with `continue-on-error` because a release test workflow must fail when pytest fails.
