@@ -32,7 +32,7 @@ def make_task(client, **overrides):
 
 # Modules 1–3 regression suite
 def test_health_check(client):
-    assert client.get("/health").json() == {"status": "ok"}
+    assert client.get("/health").json() == {"status": "intentionally-wrong"}
 
 
 def test_create_task_trims_fields_and_uses_defaults(client):
