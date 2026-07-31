@@ -12,5 +12,6 @@ docs
 upload
 *.pdf
 *.txt
+!requirements.txt
 AGENTS.md
 README.md
